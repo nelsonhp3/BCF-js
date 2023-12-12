@@ -4,6 +4,7 @@ import { Reader, TypedArray, unzip, ZipEntry, ZipInfo } from 'unzipit'
 import { IExtensionsSchema, IProject } from "./schema/project"
 import { XMLBuilder, XMLParser } from "fast-xml-parser"
 import JSZip from "jszip"
+import { generateUUID } from "./SharedHelpers"
 
 export default class BcfParser {
 
@@ -73,7 +74,8 @@ export default class BcfParser {
                 purged_markups.push(purged_markup)
             }
 
-            this.project = {
+            var newProject: IProject = {
+                parser: this,
                 project_id: projectId,
                 name: projectName,
                 version: projectVersion,
@@ -81,6 +83,8 @@ export default class BcfParser {
                 reader: this,
                 extension_schema: extension_schema
             }
+
+            this.project = this.project ? { ...newProject } : newProject
 
             this.project.markups = purged_markups.map(mkp => { return { ...mkp, project: this.project } as IMarkup })
 
@@ -140,7 +144,7 @@ function createEntries(parser: BcfParser, markups: any) {
         }
     }
 }
-// async function exportZip(files: IFile[], viewpoints: VisualizationInfo[], project: IProject): Promise<Buffer> {
+
 async function exportZip(files: IFile[]): Promise<Buffer> {
     var zip = new JSZip()
 
@@ -156,15 +160,6 @@ async function exportZip(files: IFile[]): Promise<Buffer> {
         else if (fullPath.length == 2)
             zip.folder(fullPath[0])?.file(fullPath[1], file.content)
     }
-
-    // for (const viewpoint of viewpoints) {
-    //     if (zip.filter(file => {
-    //         return file.endsWith(`${viewpoint.guid}.bcfv`) || file.endsWith(`${viewpoint.snapshot}.bcfv`)
-    //     }))
-    //         continue
-
-    //     const folder =
-    // }
 
     return await zip.generateAsync({ type: "nodebuffer", streamFiles: true })
 }
@@ -231,7 +226,7 @@ function extensionssxd(writer: BcfParser): IFile {
 
 export interface IFile {
     path: string,
-    content: string
+    content: any
 }
 
 export class Markup {
@@ -269,15 +264,20 @@ export class Markup {
                 const key = this.topic.guid + "/" + entry.viewpoint
                 const file = this.reader.getEntry(key)
 
-                if (!file) throw new Error("Missing Visualization Info")
-
-                const viewpoint = this.reader.helpers.GetViewpoint(await file.text())
-                viewpoint.snapshot = entry.snapshot
-                viewpoint.getSnapshot = async () => {
-                    if (entry.snapshot) return await this.getSnapshot(entry.snapshot)
+                var visualizationInfo: VisualizationInfo = {
+                    guid: generateUUID()
                 }
 
-                this.viewpoints.push(viewpoint)
+                if (file)
+                    visualizationInfo = this.reader.helpers.GetViewpoint(await file.text())
+
+                visualizationInfo.snapshot = entry.snapshot
+                visualizationInfo.getSnapshot = async () => {
+                    if (entry.snapshot)
+                        return await this.getSnapshot(entry.snapshot)
+                }
+
+                this.viewpoints.push(visualizationInfo)
             }
         }
     }

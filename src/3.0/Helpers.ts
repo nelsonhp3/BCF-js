@@ -40,6 +40,9 @@ export namespace Helpers {
         if (typeof obj === 'string')
             return obj
 
+        if (obj instanceof Date)
+            return (obj as Date).toISOString()
+
         const opt_plural_to_singular = options?.plural_to_singular !== undefined ? options.plural_to_singular : true
 
         for (const key in obj) {

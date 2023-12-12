@@ -119,3 +119,6 @@ BCF-js.code-workspace
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Project
+**/writer/

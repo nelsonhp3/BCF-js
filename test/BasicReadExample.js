@@ -1,14 +1,18 @@
 const bcfjs21 = require("../dist/2.1")
 const bcfjs30 = require("../dist/")
 const { readFileSync } = require("fs")
-const { readFile } = require("fs/promises")
+
+const loadFile = (version) => {
+    return readFileSync(`./test-data/bcf${version}/MaximumInformation.bcf`)
+}
 
 const testV21 = async () => {
-    const file = await readFile("./test-data/bcf2.1/MaximumInformation.bcf")
-    const reader = new bcfjs21.BcfReader()
-    await reader.read(file)
+    const file = await loadFile("2.1")
 
-    const project = reader.project
+    const parser = new bcfjs21.BcfParser()
+    await parser.read(file)
+
+    const project = parser.project
     console.log("project :>> ",project)
 
     project.markups.forEach((markup) => {
@@ -17,11 +21,11 @@ const testV21 = async () => {
         console.log("title",markup.topic.title)
 
         if (markup.viewpoints.length > 0) {
-            console.log(markup.viewpoints[0].perspective_camera)
-
             const v = markup.viewpoints
 
-            if (!v) return
+
+            if (v[0].perspective_camera)
+                console.log(v[0].perspective_camera)
 
             // Uncomment to see in Console the image data
             // v[0].getSnapshot().then(img => {
@@ -32,17 +36,14 @@ const testV21 = async () => {
     })
 }
 
-const loadFile = (version) => {
-    return readFileSync(`./test-data/bcf${version}/MaximumInformation.bcf`)
-}
-
 const testV30 = async () => {
     const file = await loadFile("3.0")
 
-    const reader = new bcfjs30.BcfReader()
-    await reader.read(file)
+    const parser = new bcfjs30.BcfParser()
+    await parser.read(file)
 
-    const project = reader.project
+    const project = parser.project
+    console.log("project :>> ",project)
 
     project.markups.forEach((markup) => {
         if (markup == undefined) return
@@ -50,11 +51,10 @@ const testV30 = async () => {
         console.log("title",markup.topic.title)
 
         if (markup.viewpoints.length > 0) {
-            console.log(markup.viewpoints[0].perspective_camera)
-
             const v = markup.viewpoints
 
-            if (!v) return
+            if (v[0].perspective_camera)
+                console.log(v[0].perspective_camera)
 
             // Uncomment to see in Console the image data
             // v[0].getSnapshot().then((img) => {
@@ -64,36 +64,5 @@ const testV30 = async () => {
     })
 }
 
-//testV21()
-//testV30()
-
-const test = async () => {
-    const file = await readFile(`./test-data/bcf3.0/writer/WriterTest.bcf`)
-    console.log("file :>> ",file)
-
-    const reader = new bcfjs30.BcfReader()
-    await reader.read(file)
-
-    const project = reader.project
-    console.log('project :>> ',project)
-
-    project.markups.forEach((markup) => {
-        if (markup == undefined) return
-
-        console.log("title",markup.topic.title)
-
-        if (markup.viewpoints.length > 0) {
-            console.log(markup.viewpoints[0].perspective_camera)
-
-            const v = markup.viewpoints
-
-            if (!v) return
-
-            // Uncomment to see in Console the image data
-            // v[0].getSnapshot().then((img) => {
-            //   if (img) console.log("base64String image data: ", img);
-            // });
-        }
-    })
-}
-test()
+testV21()
+testV30()

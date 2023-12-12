@@ -1,6 +1,7 @@
 import { IHelpers } from "../IHelpers"
 import { Helpers } from "./Helpers"
 import BcfParserBase from "../BcfParser"
+import BcfProjectBase from "../BcfProject"
 
 export * from "../schema"
 
@@ -29,5 +30,11 @@ export class BcfWriter extends BcfParserBase {
 export class BcfParser extends BcfParserBase {
     constructor() {
         super("2.1", helpersFunctions)
+    }
+}
+
+export class BcfProject extends BcfProjectBase {
+    constructor(projectName: string, projectId?: string) {
+        super("2.1", new BcfParser, projectName, projectId)
     }
 }

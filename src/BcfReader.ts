@@ -3,6 +3,7 @@ import { IHelpers } from "./IHelpers"
 import { Reader, TypedArray, unzip, ZipEntry, ZipInfo } from 'unzipit'
 import { IExtensionsSchema, IProject } from "./schema/project"
 import { XMLParser } from "fast-xml-parser"
+import BcfParser from "./BcfParser"
 
 export default class BcfReader {
 
@@ -69,12 +70,15 @@ export default class BcfReader {
                 purged_markups.push(purged_markup)
             }
 
+            const parser = new BcfParser(this.version, this.helpers)
+
             this.project = {
                 project_id: projectId,
                 name: projectName,
                 version: projectVersion,
                 markups: undefined,
-                reader: this,
+                reader: this,       // Deprecated
+                parser: parser,
                 extension_schema: extension_schema
             }
 

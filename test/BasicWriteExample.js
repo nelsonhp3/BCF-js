@@ -12,67 +12,70 @@ const writeFile = async (content, filePath) => {
 
 const testV21 = async () => {
     const file = fs.readFileSync("./test-data/bcf2.1/MaximumInformation.bcf")
-    const reader = new bcfjs21.BcfReader()
-    await reader.read(file)
+    const parser = new bcfjs21.BcfReader()
+    await parser.read(file)
 
-    let bcfproject = reader.project
+    let bcfproject = parser.project
     bcfproject.name = "This was modified by bcf-js"
     bcfproject.markups[0].topic.title = "Topic 1 renamed"
     bcfproject.markups[1].topic.title = "Topic 2 renamed"
 
     // Add Snapshots, Markup.xsd, Viewpoints... to the file
-    const writer = new bcfjs21.BcfWriter()
-    for (const entry in reader.bcf_archive.entries) {
+    for (const entry in parser.bcf_archive.entries) {
 
         if (entry.endsWith("markup.bcf"))
             continue
 
-        writer.addEntry({
+        parser.addEntry({
             path: entry,
-            content: await reader.getEntry(entry).arrayBuffer()
+            content: await parser.getEntry(entry).arrayBuffer()
         })
     }
 
-    const buffer = await writer.write(bcfproject)
+    const buffer = await parser.write(bcfproject)
     await writeFile(buffer,"./test-data/bcf2.1/writer/WriterTest.bcf")
-
-    // const readBackFile = fs.readFileSync("./test-data/bcf3.0/writer/WriterTest.bcf")
-    // const reader2 = new bcfjs21.BcfReader()
-    // await reader2.read(readBackFile)
-    // console.log(reader2.project.markups[0].topic.title)
 }
 
 const testV30 = async () => {
     const file = fs.readFileSync("./test-data/bcf3.0/MaximumInformation.bcf")
-    const reader = new bcfjs30.BcfReader()
-    await reader.read(file)
+    const parser = new bcfjs30.BcfReader()
+    await parser.read(file)
 
-    let bcfproject = reader.project
+    let bcfproject = parser.project
     bcfproject.name = "This was modified by bcf-js"
     bcfproject.markups[0].topic.title = "Topic 1 renamed"
     bcfproject.markups[1].topic.title = "Topic 2 renamed"
 
     // Add Snapshots, Markup.xsd, Viewpoints... to the file
-    const writer = new bcfjs30.BcfWriter()
-    for (const entry in reader.bcf_archive.entries) {
+    for (const entry in parser.bcf_archive.entries) {
 
         if (entry.endsWith("markup.bcf") || entry.endsWith('.version'))
             continue
 
-        writer.addEntry({
+        parser.addEntry({
             path: entry,
-            content: await reader.getEntry(entry).arrayBuffer()
+            content: await parser.getEntry(entry).arrayBuffer()
         })
     }
 
-    const buffer = await writer.write(bcfproject)
+    const buffer = await parser.write(bcfproject)
     await writeFile(buffer,"./test-data/bcf3.0/writer/WriterTest.bcf")
+}
 
-    // const readBackFile = fs.readFileSync("./test-data/bcf3.0/writer/WriterTest.bcf")
-    // const reader2 = new bcfjs30.BcfReader()
-    // await reader2.read(readBackFile)
-    // console.log(reader2.project.markups[0].topic.title)
+const testCreateProject = async () => {
+    var snapshotFile = fs.readFileSync('./test-data/snapshot_writer_test.png')
+    var snapshotArrayBuffer = snapshotFile.buffer
+
+    var project = new bcfjs30.BcfProject('Willow Grove Residences')
+    var created_markup = project.newMarkup('clash','open','Pipe clashing a structural column','Nelson Henrique')
+    var created_viewpoint = project.newViewpoint(created_markup,snapshotArrayBuffer)
+    //var created_snapshot = project.newSnapshot(created_markup,created_viewpoint.guid,snapshotArrayBuffer)
+    var created_comment = project.newComment(created_markup,'Easy. Just move the column 👌','Nelson Henrique',null,created_viewpoint.guid)
+
+    const buffer = await project.write()
+    await writeFile(buffer,"./test-data/bcf3.0/writer/WriterTestNewProject.bcf")
 }
 
 testV21()
 testV30()
+testCreateProject()

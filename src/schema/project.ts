@@ -1,3 +1,4 @@
+import BcfParser from "../BcfParser"
 import { IMarkup } from "./markup"
 
 export interface IProject {
@@ -6,6 +7,7 @@ export interface IProject {
     version: string
     markups?: IMarkup[]
     reader: any
+    parser: BcfParser
     extension_schema: IExtensionsSchema | undefined
 }
 
