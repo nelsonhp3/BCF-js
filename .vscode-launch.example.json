@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run BasicReadExample.js",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\test\\BasicReadExample.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run BasicWriteExample.js",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\test\\BasicWriteExample.js"
+        }
+    ]
+}

@@ -5,7 +5,7 @@ import * as SharedHelpers from '../SharedHelpers'
 export namespace Helpers {
 
     export const XmlParserOptions = { ...SharedHelpers.XmlParserOptions, oneListGroup: true }
-    export const XmlBuilderOptions = SharedHelpers.XmlBuilderOptions
+    export const XmlBuilderOptions = { ...SharedHelpers.XmlBuilderOptions, oneListGroup: true }
     export const GetViewpoint = SharedHelpers.GetViewpoint
     export const XmlToJsonNotation = SharedHelpers.XmlToJsonNotation
     const ChangeToUppercase = SharedHelpers.ChangeToUppercase

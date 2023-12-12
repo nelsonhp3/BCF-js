@@ -75,7 +75,7 @@ async function exportZip(files: IFile[]): Promise<Buffer> {
             zip.folder(fullPath[0])?.file(fullPath[1], file.content)
     }
 
-    return await zip.generateAsync({ type: "nodebuffer" })
+    return await zip.generateAsync({ type: "nodebuffer", streamFiles: true })
 }
 
 function bcfversion(version: string): IFile {

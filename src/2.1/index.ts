@@ -1,7 +1,6 @@
 import { IHelpers } from "../IHelpers"
 import { Helpers } from "./Helpers"
-import BcfReaderBase from "../BcfReader"
-import BcfWriterBase from "../BcfWriter"
+import BcfParserBase from "../BcfParser"
 
 export * from "../schema"
 
@@ -15,13 +14,19 @@ const helpersFunctions: IHelpers = {
     XmlBuilderOptions: Helpers.XmlBuilderOptions
 }
 
-export class BcfReader extends BcfReaderBase {
+export class BcfReader extends BcfParserBase {
     constructor() {
         super("2.1", helpersFunctions)
     }
 }
 
-export class BcfWriter extends BcfWriterBase {
+export class BcfWriter extends BcfParserBase {
+    constructor() {
+        super("2.1", helpersFunctions)
+    }
+}
+
+export class BcfParser extends BcfParserBase {
     constructor() {
         super("2.1", helpersFunctions)
     }

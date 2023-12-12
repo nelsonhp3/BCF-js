@@ -254,6 +254,14 @@ export function ChangeToUppercase(key: string, options: any = {}): string {
     return output
 }
 
+export function generateUUID() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+        var r = (Math.random() * 16) | 0,
+            v = c === "x" ? r : (r & 0x3) | 0x8
+        return v.toString(16)
+    })
+}
+
 function isAttribute(output: string, options: any): boolean {
     const opt_additional_attributes = options.additional_attributes || []
 

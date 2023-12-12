@@ -34,7 +34,12 @@ const testV21 = async () => {
     }
 
     const buffer = await writer.write(bcfproject)
-    await writeFile(buffer, "./test-data/bcf2.1/Writer/WriterTest.bcf")
+    await writeFile(buffer,"./test-data/bcf2.1/writer/WriterTest.bcf")
+
+    // const readBackFile = fs.readFileSync("./test-data/bcf3.0/writer/WriterTest.bcf")
+    // const reader2 = new bcfjs21.BcfReader()
+    // await reader2.read(readBackFile)
+    // console.log(reader2.project.markups[0].topic.title)
 }
 
 const testV30 = async () => {
@@ -61,7 +66,12 @@ const testV30 = async () => {
     }
 
     const buffer = await writer.write(bcfproject)
-    await writeFile(buffer, "./test-data/bcf3.0/Writer/WriterTest.bcf")
+    await writeFile(buffer,"./test-data/bcf3.0/writer/WriterTest.bcf")
+
+    // const readBackFile = fs.readFileSync("./test-data/bcf3.0/writer/WriterTest.bcf")
+    // const reader2 = new bcfjs30.BcfReader()
+    // await reader2.read(readBackFile)
+    // console.log(reader2.project.markups[0].topic.title)
 }
 
 testV21()
