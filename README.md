@@ -14,11 +14,11 @@ To install the library use:
 
 For BCF-XML 3.0:
 ``` javascript
-import { BcfReader, BcfWriter } from '@parametricos/bcf-js';
+import { BcfParser } from '@parametricos/bcf-js';
 ```
 For BCF-XML 2.1:
 ``` javascript
-import { BcfReader, BcfWriter } from '@parametricos/bcf-js/2.1';
+import { BcfParser } from '@parametricos/bcf-js/2.1';
 ```
 
 ### Reading a file:
@@ -26,11 +26,11 @@ import { BcfReader, BcfWriter } from '@parametricos/bcf-js/2.1';
 ``` javascript
   const file = "some_bcf_file.bcf"
 
-  const reader = new BcfReader();
+  const parser = new BcfParser();
   
-  await reader.read(file);
+  await parser.read(file);
 
-  const project = reader.project
+  const project = parser.project
   
   project.markups.forEach((markup) => {
     console.log(markup.topic);
@@ -48,9 +48,9 @@ import { BcfReader, BcfWriter } from '@parametricos/bcf-js/2.1';
   
   const savePath = "./test-data/bcf3.0/Writer/WriteTest.bcf"
 
-  const writer = new BcfWriter();
+  const parser = new BcfParser();
   
-  const content = await writer.write(bcfproject)
+  const content = await parser.write(bcfproject)
   fs.writeFile(savePath, content, (err) => {})
 
   // See ./test/BasicWriteExample.js for more examples
