@@ -6,19 +6,38 @@ import { XMLBuilder, XMLParser } from "fast-xml-parser"
 import JSZip from "jszip"
 import { generateUUID } from "./SharedHelpers"
 
+//TODO: Fix .bcfv creator
+//TODO: Fix extensions creator
+//TODO: Update or downgrade project version
+//TODO: Fix file entries logic
+
 export default class BcfParser {
 
     version: string
     bcf_archive: ZipInfo | undefined
     files: any[]
-    project: IProject | undefined
+    project: IProject
     markups: Markup[] = []
     helpers: IHelpers
 
-    constructor(version: string, helpers: IHelpers) {
+    constructor(version: string, helpers: IHelpers, project?: IProject) {
+        this.project = project ?? this.createEmptyProject()
         this.version = version
         this.helpers = helpers
         this.files = []
+    }
+
+    createEmptyProject = (): IProject => {
+        var newProject: IProject = {
+            parser: this,
+            reader: this,
+            project_id: generateUUID(),
+            name: 'Blank Project',
+            version: this.version,
+            markups: [],
+            extension_schema: undefined
+        }
+        return newProject
     }
 
     //#region unzipit to import .bcf fle
@@ -37,6 +56,7 @@ export default class BcfParser {
 
             for (const [name, entry] of Object.entries(entries)) {
 
+                //TODO: Change this logic to handle file changes
                 if (name.endsWith('.bcf')) {
                     markups.push(entry)
                 }
@@ -67,7 +87,7 @@ export default class BcfParser {
             for (let i = 0; i < markups.length; i++) {
                 const t = markups[i]
                 const markup = new Markup(this, t)
-                await markup.read()
+                await markup.read(this.project)
                 this.markups.push(markup)
 
                 const purged_markup = { header: markup.header, topic: markup.topic, project: this.project, viewpoints: markup.viewpoints } as IMarkup
@@ -79,7 +99,7 @@ export default class BcfParser {
                 project_id: projectId,
                 name: projectName,
                 version: projectVersion,
-                markups: undefined,
+                markups: [],
                 reader: this,
                 extension_schema: extension_schema
             }
@@ -100,23 +120,25 @@ export default class BcfParser {
     //#endregion
 
     //#region jszip to export .bcf file
-    addEntry = (file: IFile) => {
-        if (file.path.endsWith('.version'))
-            return
-
+    addEntry = (file: IFileEntry) => {
         this.files.push(file)
     }
 
-    write = async (project: IProject): Promise<Buffer | undefined> => {
+    write = async (): Promise<Buffer | undefined> => {
         try {
-            this.project = project
-            createEntries(this, project.markups)
+            createEntries(this, this.project.markups)
             return await exportZip(this.files)
         } catch (e) {
             console.log("Error in writing BCF archive. The error below was thrown.")
             console.error(e)
         }
     }
+
+    removeEntry(lambdaExpression: (actual: IFileEntry) => boolean) {
+        const fileredFiles = this.files.filter(file => !lambdaExpression(file))
+        this.files = fileredFiles
+    }
+
     //#endregion
 }
 
@@ -125,8 +147,8 @@ function createEntries(parser: BcfParser, markups: any) {
         return
 
     parser.addEntry(bcfversion(parser.version))
-    parser.addEntry(projectbcfp(parser.project.project_id, parser.project.name))
-    parser.addEntry(extensionssxd(parser))
+    //parser.addEntry(projectbcfp(parser.project.project_id, parser.project.name))
+    //parser.addEntry(extensionssxd(parser))
 
     for (const markup of markups) {
         const formattedMarkup = parser.helpers.MarkupToXmlNotation(markup)
@@ -145,7 +167,11 @@ function createEntries(parser: BcfParser, markups: any) {
     }
 }
 
-async function exportZip(files: IFile[]): Promise<Buffer> {
+export function removeEntry(parser: BcfParser, lambdaExpression: (actual: IFileEntry) => boolean) {
+    parser.files = parser.files.filter(file => !lambdaExpression(file))
+}
+
+async function exportZip(files: IFileEntry[]): Promise<Buffer> {
     var zip = new JSZip()
 
     //TODO: Not always all the files will be in the unzipit folder. A snapshot may be get from an html, for example.
@@ -164,7 +190,7 @@ async function exportZip(files: IFile[]): Promise<Buffer> {
     return await zip.generateAsync({ type: "nodebuffer", streamFiles: true })
 }
 
-function bcfversion(version: string): IFile {
+function bcfversion(version: string): IFileEntry {
     return {
         path: 'bcf.version',
         content: `<?xml version="1.0" encoding="utf-8"?>
@@ -175,7 +201,7 @@ function bcfversion(version: string): IFile {
     }
 }
 
-function projectbcfp(projectId: string, projectName: string): IFile {
+function projectbcfp(projectId: string, projectName: string): IFileEntry {
     return {
         path: 'project.bcfp',
         content: `<?xml version="1.0" encoding="utf-8"?>
@@ -188,7 +214,7 @@ function projectbcfp(projectId: string, projectName: string): IFile {
     }
 }
 
-function extensionssxd(writer: BcfParser): IFile {
+function extensionssxd(writer: BcfParser): IFileEntry {
     const attributes = [
         'version',
         'encoding',
@@ -224,7 +250,7 @@ function extensionssxd(writer: BcfParser): IFile {
     }
 }
 
-export interface IFile {
+export interface IFileEntry {
     path: string,
     content: any
 }
@@ -242,13 +268,13 @@ export class Markup {
         this.markup_file = markup
     }
 
-    read = async () => {
-        await this.parseMarkup()
+    read = async (project: IProject) => {
+        await this.parseMarkup(project)
         await this.parseViewpoints()
     }
 
-    private parseMarkup = async () => {
-        const markup = this.reader.helpers.GetMarkup(await this.markup_file.text())
+    private parseMarkup = async (project: IProject) => {
+        const markup = this.reader.helpers.GetMarkup(await this.markup_file.text(), project)
         this.topic = markup.topic
         this.header = markup.header
     }

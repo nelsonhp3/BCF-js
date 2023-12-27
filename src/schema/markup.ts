@@ -3,8 +3,8 @@ import { VisualizationInfo } from "./viewpoint"
 
 export interface IMarkup {
     header?: IHeader
-    topic: ITopic | undefined
-    project?: IProject
+    topic: ITopic
+    project: IProject
     viewpoints?: VisualizationInfo[]
 }
 

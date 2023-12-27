@@ -1,5 +1,16 @@
+# Folders
+
 .idea
 test-data
 test
 .yarn
 node_modules
+.vscode
+src
+
+# Files
+.vscode-launch.example.json
+.yarnrc.yml
+babel.config.js
+jsconfig.json
+LICENSE

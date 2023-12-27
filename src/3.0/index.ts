@@ -34,7 +34,7 @@ export class BcfParser extends BcfParserBase {
 }
 
 export class BcfProject extends BcfProjectBase {
-    constructor(projectName: string, projectId?: string) {
+    constructor(projectName?: string, projectId?: string) {
         super("3.0", new BcfParser, projectName, projectId)
     }
 }

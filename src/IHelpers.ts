@@ -1,7 +1,7 @@
-import { IMarkup, VisualizationInfo } from "./schema"
+import { IMarkup, IProject, VisualizationInfo } from "./schema"
 
 export interface IHelpers {
-    GetMarkup(xmlString: any): IMarkup,
+    GetMarkup(xmlString: any, project: IProject): IMarkup,
     GetViewpoint(xmlString: any): VisualizationInfo
     MarkupToXmlNotation(markup: any): any
     XmlToJsonNotation(node: any): any

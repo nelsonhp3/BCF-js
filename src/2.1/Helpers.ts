@@ -1,4 +1,4 @@
-import { IComment, IFile, IMarkup, IViewPoint } from "../schema"
+import { IComment, IFile, IMarkup, IProject, IViewPoint } from "../schema"
 import { XMLParser } from "fast-xml-parser"
 import * as SharedHelpers from '../SharedHelpers'
 
@@ -10,7 +10,8 @@ export namespace Helpers {
     export const XmlToJsonNotation = SharedHelpers.XmlToJsonNotation
     const ChangeToUppercase = SharedHelpers.ChangeToUppercase
 
-    export function GetMarkup(xmlString: any): IMarkup {
+    export function GetMarkup(xmlString: any, project: IProject): IMarkup {
+
         const { Markup } = new XMLParser(XmlParserOptions).parse(xmlString)
 
         return {
@@ -37,6 +38,7 @@ export namespace Helpers {
                 comments: Helpers.GetComments(Markup.Comment),
                 viewpoints: Helpers.GetViewpoints(Markup.Viewpoints)
             },
+            project: project
         }
     }
 

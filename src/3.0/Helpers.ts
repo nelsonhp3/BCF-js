@@ -1,4 +1,4 @@
-import { IHeader, IMarkup, ITopic } from "../schema"
+import { IHeader, IMarkup, IProject, ITopic } from "../schema"
 import { XMLParser } from "fast-xml-parser"
 import * as SharedHelpers from '../SharedHelpers'
 
@@ -10,13 +10,14 @@ export namespace Helpers {
     export const XmlToJsonNotation = SharedHelpers.XmlToJsonNotation
     const ChangeToUppercase = SharedHelpers.ChangeToUppercase
 
-    export function GetMarkup(xmlString: any): IMarkup {
+    export function GetMarkup(xmlString: any, project: IProject): IMarkup {
         const { Markup } = new XMLParser(XmlParserOptions).parse(xmlString)
         const formattedMarkup = XmlToJsonNotation(Markup)
 
         return {
             header: formattedMarkup.header as IHeader,
-            topic: formattedMarkup.topic as ITopic
+            topic: formattedMarkup.topic as ITopic,
+            project: project
         }
     }
 

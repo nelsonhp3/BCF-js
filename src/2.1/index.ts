@@ -15,26 +15,18 @@ const helpersFunctions: IHelpers = {
     XmlBuilderOptions: Helpers.XmlBuilderOptions
 }
 
-export class BcfReader extends BcfParserBase {
-    constructor() {
-        super("2.1", helpersFunctions)
-    }
-}
-
-export class BcfWriter extends BcfParserBase {
-    constructor() {
-        super("2.1", helpersFunctions)
-    }
-}
-
 export class BcfParser extends BcfParserBase {
     constructor() {
         super("2.1", helpersFunctions)
     }
 }
 
+export class BcfReader extends BcfParser { }
+
+export class BcfWriter extends BcfParser { }
+
 export class BcfProject extends BcfProjectBase {
-    constructor(projectName: string, projectId?: string) {
+    constructor(projectName?: string, projectId?: string) {
         super("2.1", new BcfParser, projectName, projectId)
     }
 }

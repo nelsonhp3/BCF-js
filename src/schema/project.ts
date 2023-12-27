@@ -5,7 +5,7 @@ export interface IProject {
     project_id: string
     name: string
     version: string
-    markups?: IMarkup[]
+    markups: IMarkup[]
     reader: any
     parser: BcfParser
     extension_schema: IExtensionsSchema | undefined
