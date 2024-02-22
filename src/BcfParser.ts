@@ -5,6 +5,7 @@ import { IExtensionsSchema, IProject } from "./schema/project"
 import { XMLBuilder, XMLParser } from "fast-xml-parser"
 import JSZip from "jszip"
 import { generateUUID } from "./SharedHelpers"
+import BcfProject from "./BcfProject"
 
 //TODO: Fix .bcfv creator
 //TODO: Fix extensions creator
@@ -16,31 +17,18 @@ export default class BcfParser {
     version: string
     bcf_archive: ZipInfo | undefined
     files: any[]
-    project: IProject
+    project: BcfProject
     markups: Markup[] = []
     helpers: IHelpers
 
-    constructor(version: string, helpers: IHelpers, project?: IProject) {
-        this.project = project ?? this.createEmptyProject()
+    constructor(version: string, helpers: IHelpers, project?: BcfProject) {
         this.version = version
         this.helpers = helpers
+        this.project = project ?? new BcfProject(this.version, this, 'Blank Project')
         this.files = []
     }
 
-    createEmptyProject = (): IProject => {
-        var newProject: IProject = {
-            parser: this,
-            reader: this,
-            project_id: generateUUID(),
-            name: 'Blank Project',
-            version: this.version,
-            markups: [],
-            extension_schema: undefined
-        }
-        return newProject
-    }
-
-    //#region unzipit to import .bcf fle
+    //#region unzipit to import .bcf file
     read = async (src: string | ArrayBuffer | TypedArray | Blob | Reader) => {
         try {
             const markups: ZipEntry[] = []
@@ -94,18 +82,8 @@ export default class BcfParser {
                 purged_markups.push(purged_markup)
             }
 
-            var newProject: IProject = {
-                parser: this,
-                project_id: projectId,
-                name: projectName,
-                version: projectVersion,
-                markups: [],
-                reader: this,
-                extension_schema: extension_schema
-            }
-
-            this.project = this.project ? { ...newProject } : newProject
-
+            this.project = new BcfProject(projectVersion, this, projectName, projectId)
+            this.project.extension_schema = extension_schema
             this.project.markups = purged_markups.map(mkp => { return { ...mkp, project: this.project } as IMarkup })
 
         } catch (e) {

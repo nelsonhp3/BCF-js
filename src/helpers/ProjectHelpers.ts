@@ -25,16 +25,16 @@ export function newMarkup(project: IProject, topic_type: string, topic_status: s
     return newMarkup
 }
 
-export function newComment(markup: IMarkup, comment: string, author: string, creation_date?: Date, viewpointId?: string): IComment {
+export function newComment(project: IProject, topicId: string, comment: string, author: string, creation_date?: Date, viewpointId?: string): IComment {
     var newComment: IComment = {
         guid: generateUUID(),
         comment: comment,
         author: author,
-        date: creation_date ?? new Date(Date.now()),
+        date: creation_date || new Date(Date.now()),
         viewpoint: viewpointId
     }
 
-    markup.topic?.comments?.push(newComment)
+    searchMarkup(project, topicId)?.topic?.comments?.push(newComment)
     return newComment
 }
 
@@ -102,10 +102,9 @@ export function newSnapshot(markup: IMarkup, snapshotArrayBuffer: ArrayBuffer, v
     return mkpViewpoint
 }
 
-export function searchViewpointMarkup(project: IProject, viewpointGUID: string): IMarkup | undefined {
-    return project.markups?.filter(mkp => mkp.viewpoints?.find(vp => vp.guid === viewpointGUID))[0]
-}
+// export function editComment(project: IProject, commentGUID: string, payload: any): IComment | undefined {
 
+// }
 export function editViewpointInfo(project: IProject, guid: string, snapshot?: string, index?: number, getSnapshot?: () => Promise<string | undefined>) {
     const searchResult = searchViewpoint(project, guid)
     if (!searchResult) return false
@@ -157,6 +156,10 @@ export function removeViewpoint(project: IProject, viewpointId: string): void {
         comment[0].comment.viewpoint = undefined
 }
 
+export function searchMarkup(project: IProject, guid: string): IMarkup | undefined {
+    return project.markups?.find(markup => markup.topic.guid === guid)
+}
+
 export function searchViewpoint(project: IProject, viewpointId: string): any {
     for (var i = 0; i < project.markups.length; i++) {
         const visualizationInfo = project.markups[i].viewpoints?.find(visualizationInfo => visualizationInfo.guid == viewpointId)
@@ -166,6 +169,10 @@ export function searchViewpoint(project: IProject, viewpointId: string): any {
         return { viewpoint: viewpoint, visualizationInfo: visualizationInfo, markup: project.markups[i] }
     }
     return undefined
+}
+
+export function searchViewpointMarkup(project: IProject, viewpointGUID: string): IMarkup | undefined {
+    return project.markups?.filter(mkp => mkp.viewpoints?.find(vp => vp.guid === viewpointGUID))[0]
 }
 
 export function searchComments(project: IProject, predicate: (comment: IComment) => boolean): any {

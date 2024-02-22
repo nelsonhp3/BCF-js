@@ -36,7 +36,9 @@ export default class BcfProject implements IProject {
     public newMarkup(topic_type: string, topic_status: string, title: string, creation_author: string, creation_date?: Date): IMarkup {
         return projectHelpers.newMarkup(this, topic_type, topic_status, title, creation_author, creation_date)
     }
-    public newComment = projectHelpers.newComment
+    public newComment(markupId: string, comment: string, author: string, creation_date ?: Date, viewpointId ?: string): IComment {
+        return projectHelpers.newComment(this, markupId, comment, author, creation_date, viewpointId)
+    }
     public newViewpoint = projectHelpers.newViewpoint
     public newSnapshot = projectHelpers.newSnapshot
     public editViewpointInfo(guid: string, snapshot?: string, index?: number, getSnapshot?: () => Promise<string | undefined>) {
